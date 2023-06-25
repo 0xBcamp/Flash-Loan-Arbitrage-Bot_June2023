@@ -1,0 +1,62 @@
+name: "Workflow for Feature branches"
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  solhint:
+    name: solhint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: Install solhint
+        run: |
+          npm install -g solhint
+          solhint --version
+
+      - name: Initialize solhit
+        run: solhint --init
+
+      - name: Run solhint
+        run: solhint 'contracts/**/*.sol'
+
+  compile:
+    name: NPM compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: NPM compile
+        run: |
+          npm install
+          npm run compile
+
+  test:
+    needs: [compile]
+    name: NPM test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: NPM test
+        run: |
+          npm install
+          npm run test

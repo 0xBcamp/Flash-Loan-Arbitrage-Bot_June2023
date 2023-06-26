@@ -5,8 +5,9 @@ import "../interfaces/IArbitrageEngine.sol";
 import "../interfaces/IFlashLoanHandler.sol";
 import "../interfaces/ITradeExecutor.sol";
 import "../interfaces/IRepaymentHandler.sol";
+import "./Whitelisted.sol";
 
-contract FlashLoanArbitrageBot {
+contract FlashLoanArbitrageBot is Whitelisted {
     IArbitrageEngine public arbitrageEngine;
     IFlashLoanHandler public flashLoanHandler;
     ITradeExecutor public tradeExecutor;
@@ -24,5 +25,5 @@ contract FlashLoanArbitrageBot {
         repaymentHandler = IRepaymentHandler(_repaymentHandler);
     }
 
-    function execute(address dex1, address dex2) external {}
+    function execute(address dex1, address dex2) external onlyWhitelisted {}
 }

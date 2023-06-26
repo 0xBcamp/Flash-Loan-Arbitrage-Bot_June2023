@@ -2,7 +2,11 @@
 pragma solidity ^0.8.20;
 
 import "../interfaces/IRepaymentHandler.sol";
+import "./Whitelisted.sol";
 
-contract RepaymentHandler is IRepaymentHandler {
-    function repayLoan(address asset, uint256 amount) external {}
+contract RepaymentHandler is IRepaymentHandler, Whitelisted {
+    function repayLoan(
+        address asset,
+        uint256 amount
+    ) external onlyWhitelisted {}
 }

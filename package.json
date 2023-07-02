@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "deploy": "hardhat run .\\scripts\\deploy.ts",
-    "compile": "hardhat compile",
-    "test": "hardhat test --typecheck"
+    "compile": "hardhat compile --force",
+    "test": "hardhat test --typecheck",
+    "node": "hardhat node"
   },
   "author": "martelskiy, eldergutierrez",
   "license": "MIT",

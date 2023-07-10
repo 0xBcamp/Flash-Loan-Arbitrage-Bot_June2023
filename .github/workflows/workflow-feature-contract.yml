@@ -1,4 +1,4 @@
-name: "Workflow for Feature branches"
+name: "Workflow for Contract Feature branches"
 
 on:
   push:
@@ -9,6 +9,9 @@ jobs:
   solhint:
     name: solhint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
     steps:
       - uses: actions/checkout@v3
 
@@ -31,6 +34,9 @@ jobs:
   compile:
     name: NPM compile
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
     steps:
       - uses: actions/checkout@v3
 
@@ -48,6 +54,9 @@ jobs:
     needs: [compile]
     name: NPM test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
     steps:
       - uses: actions/checkout@v3
 

@@ -52,12 +52,14 @@ contract ArbitrageEngine is IArbitrageEngine, Whitelisted {
         if (priceDex1 > priceDex2) {
             // Apply histereis
             if ((priceDex1 - priceDex2) < priceTolerance) return false;
-            emit ArbitrageOpportunity(dex1, token1, dex2); // buy token1 on dex1, sell token1 on dex2 (buy token2 on dex2)
+            // buy token1 on dex1, sell token1 on dex2 (buy token2 on dex2)
+            emit ArbitrageOpportunity(dex1, token1, dex2);
             return true;
         } else {
             // Apply histereis
             if ((priceDex2 - priceDex1) < priceTolerance) return false;
-            emit ArbitrageOpportunity(dex2, token1, dex1); // buy token1 on dex2, sell token1 on dex1 (buy token2 on dex1)
+            // buy token1 on dex2, sell token1 on dex1 (buy token2 on dex1)
+            emit ArbitrageOpportunity(dex2, token1, dex1);
             return true;
         }
     }

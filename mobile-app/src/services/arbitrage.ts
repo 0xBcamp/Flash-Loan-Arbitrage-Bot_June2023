@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { contractAddress, engineAbi } from "src/constants/contract";
 
-export const signerIsWhitelisted = async (provider: any): Promise<void> => {
+export const signerIsWhitelisted = async (provider: any): Promise<boolean> => {
   try {
     const web3Provider = new ethers.providers.Web3Provider(provider);
 
@@ -13,10 +13,11 @@ export const signerIsWhitelisted = async (provider: any): Promise<void> => {
 
     const signer = await web3Provider.getSigner();
 
-    const isWhitelisted = await contract.isWhitelisted(
+    const isWhitelisted: boolean = await contract.isWhitelisted(
       await signer.getAddress()
     );
     console.log(`signer is whitelisted: ${isWhitelisted}`);
+    return isWhitelisted;
   } catch (error) {
     throw error;
   }

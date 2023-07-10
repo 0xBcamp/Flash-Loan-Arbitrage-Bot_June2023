@@ -5,15 +5,21 @@ import { styles } from "./HomView.styles";
 import { WalletContext } from "contexts/WalletContext";
 import { signerIsWhitelisted } from "services/arbitrage";
 import { useWalletConnectModal } from "@walletconnect/modal-react-native";
-import { ethers } from "ethers";
-import { contractAddress, engineAbi } from "src/constants/contract";
+
+type State = {
+  isLoading: boolean;
+  isWhitelisted: boolean | undefined;
+};
 
 type Props = {};
 
 export const HomeView: React.FC<Props> = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, setState] = useState<State>({
+    isLoading: false,
+    isWhitelisted: undefined,
+  });
   const walletContext = React.useContext(WalletContext);
-  const { provider, isConnected } = useWalletConnectModal();
+  const { provider } = useWalletConnectModal();
 
   return (
     <View style={styles.container}>
@@ -25,11 +31,11 @@ export const HomeView: React.FC<Props> = () => {
           <Button
             style={styles.button}
             mode="contained"
-            disabled={isLoading}
+            disabled={state.isLoading}
             onPress={async () => {
-              setIsLoading(true);
+              setState({ isLoading: true, isWhitelisted: false });
               await walletContext.disconnect();
-              setIsLoading(false);
+              setState({ isLoading: false, isWhitelisted: false });
             }}
           >
             disconnect
@@ -39,17 +45,20 @@ export const HomeView: React.FC<Props> = () => {
           <Button
             style={styles.button}
             mode="contained"
-            disabled={isLoading}
+            disabled={state.isLoading}
             onPress={async () => {
-              setIsLoading(true);
-              await signerIsWhitelisted(provider);
-              setIsLoading(false);
+              setState({ isLoading: true, isWhitelisted: false });
+              const isWhitelisted = await signerIsWhitelisted(provider);
+              setState({ isLoading: false, isWhitelisted: isWhitelisted });
             }}
           >
             launch
           </Button>
         </View>
       </View>
+      <Text
+        style={styles.text}
+      >{`signer is whitelisted: ${state.isWhitelisted}`}</Text>
     </View>
   );
 };

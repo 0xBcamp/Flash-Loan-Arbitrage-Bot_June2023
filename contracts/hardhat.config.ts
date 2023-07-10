@@ -12,7 +12,7 @@ const {
 
 const config: HardhatUserConfig = {
   solidity: "0.8.19",
-  defaultNetwork: "localhost",
+  defaultNetwork: "optimismGoerli",
   networks: {
     localhost: {
       url: "http://127.0.0.1:8545",

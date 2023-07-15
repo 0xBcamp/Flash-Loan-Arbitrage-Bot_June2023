@@ -1,10 +1,14 @@
 import { ethers, network } from "hardhat";
 
-const standaloneContracts: string[] = ["ArbitrageFinder", "TradeExecutor"];
+const standaloneContracts: string[] = ["TradeExecutor"];
 
 const ownerAddress = network.config.from;
 
-const { GOERLI_POOL_ADDRESS_PROVIDER } = process.env;
+const {
+  GOERLI_POOL_ADDRESS_PROVIDER,
+  GOERLI_UNISWAP_ROUTER_ADDRESS,
+  GOERLI_SUSHISWAP_ROUTER_ADDRESS,
+} = process.env;
 
 async function main() {
   if (ownerAddress === undefined) {
@@ -26,6 +30,7 @@ async function deployContracts() {
   const tradeExecutorAddr = await deployArbitrageExecutor(
     contractNameAddr.get("TradeExecutor")!
   );
+  const arbitrageFinderAddr = await deployArbitrageFinder();
 
   const botContractName = "ArbitrageBot";
   console.log(`deploying ${botContractName} contract`);
@@ -33,7 +38,7 @@ async function deployContracts() {
   const contractFactory = await ethers.getContractFactory(botContractName);
 
   var contract = await contractFactory.deploy(
-    contractNameAddr.get("ArbitrageFinder")!,
+    arbitrageFinderAddr,
     tradeExecutorAddr
   );
 
@@ -75,6 +80,27 @@ async function deployArbitrageExecutor(
   var contract = await contractFactory.deploy(
     GOERLI_POOL_ADDRESS_PROVIDER!,
     tradeExecutorAddr
+  );
+
+  contract = await contract.waitForDeployment();
+
+  const address = await contract.getAddress();
+  console.log(
+    `contract with name ${contractName} was deployed to address: ${address}`
+  );
+
+  return address;
+}
+
+async function deployArbitrageFinder(): Promise<string> {
+  const contractName = "ArbitrageFinder";
+  console.log(`deploying ${contractName} contract`);
+
+  const contractFactory = await ethers.getContractFactory(contractName);
+
+  var contract = await contractFactory.deploy(
+    GOERLI_UNISWAP_ROUTER_ADDRESS!,
+    GOERLI_SUSHISWAP_ROUTER_ADDRESS!
   );
 
   contract = await contract.waitForDeployment();

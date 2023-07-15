@@ -23,6 +23,8 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.2"
+    "@aave/core-v3": "^1.18.0",
+    "@openzeppelin/contracts": "^4.9.2",
+    "@uniswap/v2-periphery": "^1.1.0-beta.0"
   }
 }

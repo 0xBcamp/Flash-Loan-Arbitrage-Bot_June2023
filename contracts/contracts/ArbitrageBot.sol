@@ -7,8 +7,8 @@ import "./Whitelisted.sol";
 import "../lib/Arbitrage.sol";
 
 contract ArbitrageBot is Whitelisted {
-    IArbitrageFinder private arbitrageFinder;
-    IArbitrageExecutor private arbitrageExecutor;
+    IArbitrageFinder private immutable arbitrageFinder;
+    IArbitrageExecutor private immutable arbitrageExecutor;
 
     constructor(address _arbitragFinder, address _arbitrageExecutor) {
         arbitrageFinder = IArbitrageFinder(_arbitragFinder);

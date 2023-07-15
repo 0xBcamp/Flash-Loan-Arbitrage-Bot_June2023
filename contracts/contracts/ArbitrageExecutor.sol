@@ -14,7 +14,7 @@ contract ArbitrageExecutor is
     Whitelisted,
     IArbitrageExecutor
 {
-    ITradeExecutor private tradeExecutor;
+    ITradeExecutor private immutable tradeExecutor;
 
     constructor(
         address _addressProvider,

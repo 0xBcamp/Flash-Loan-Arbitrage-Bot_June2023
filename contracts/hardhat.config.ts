@@ -11,8 +11,20 @@ const {
 } = process.env;
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.19",
-  defaultNetwork: "optimismGoerli",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.10",
+      },
+      {
+        version: "0.8.19",
+      },
+      {
+        version: "0.6.2",
+      },
+    ],
+  },
+  defaultNetwork: "localhost",
   networks: {
     localhost: {
       url: "http://127.0.0.1:8545",

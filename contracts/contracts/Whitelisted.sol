@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.0;
 
-contract Whitelisted {
+abstract contract Whitelisted {
     mapping(address => bool) private whitelist;
     address private owner;
 

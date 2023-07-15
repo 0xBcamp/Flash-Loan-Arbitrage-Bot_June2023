@@ -1,13 +1,10 @@
 import { ethers, network } from "hardhat";
 
-const standaloneContracts: string[] = [
-  "ArbitrageEngine",
-  "FlashLoanHandler",
-  "TradeExecutor",
-  "RepaymentHandler",
-];
+const standaloneContracts: string[] = ["ArbitrageFinder", "TradeExecutor"];
 
 const ownerAddress = network.config.from;
+
+const { GOERLI_POOL_ADDRESS_PROVIDER } = process.env;
 
 async function main() {
   if (ownerAddress === undefined) {
@@ -26,21 +23,22 @@ async function main() {
 
 async function deployContracts() {
   const contractNameAddr = await deployStandaloneContracts();
-  
-  const botContractName = "FlashLoanArbitrageBot";
+  const tradeExecutorAddr = await deployArbitrageExecutor(
+    contractNameAddr.get("TradeExecutor")!
+  );
+
+  const botContractName = "ArbitrageBot";
   console.log(`deploying ${botContractName} contract`);
 
   const contractFactory = await ethers.getContractFactory(botContractName);
 
   var contract = await contractFactory.deploy(
-    contractNameAddr.get("ArbitrageEngine")!,
-    contractNameAddr.get("FlashLoanHandler")!,
-    contractNameAddr.get("TradeExecutor")!,
-    contractNameAddr.get("RepaymentHandler")!
+    contractNameAddr.get("ArbitrageFinder")!,
+    tradeExecutorAddr
   );
 
   contract = await contract.waitForDeployment();
-  
+
   console.log(
     `contract with name ${botContractName} was deployed to address: ${await contract.getAddress()}`
   );
@@ -64,6 +62,29 @@ async function deployStandaloneContracts(): Promise<Map<string, string>> {
   }
 
   return contractNameAddr;
+}
+
+async function deployArbitrageExecutor(
+  tradeExecutorAddr: string
+): Promise<string> {
+  const contractName = "ArbitrageExecutor";
+  console.log(`deploying ${contractName} contract`);
+
+  const contractFactory = await ethers.getContractFactory(contractName);
+
+  var contract = await contractFactory.deploy(
+    GOERLI_POOL_ADDRESS_PROVIDER!,
+    tradeExecutorAddr
+  );
+
+  contract = await contract.waitForDeployment();
+
+  const address = await contract.getAddress();
+  console.log(
+    `contract with name ${contractName} was deployed to address: ${address}`
+  );
+
+  return address;
 }
 
 main().catch((error) => {

@@ -26,6 +26,6 @@ This component interacts with the identified DEXs to execute the sequence of tra
 
 After executing the trades, this component ensures that the borrowed funds, including any fees, are repaid to the flash loan provider contract within the same transaction. It handles the repayment process.
 
-![Flow Chart Diagram](./misc/diagram.png)
+![Flow Chart Diagram](./misc/arbitrage-bot-flow.png)
 
 ## [Figma](https://www.figma.com/file/mzUf9YeiZHsMv8zQSkNx87/flash-loan-arbitrage-bot?type=whiteboard&node-id=0%3A1&t=TvfSawJxSZboi2q6-1)

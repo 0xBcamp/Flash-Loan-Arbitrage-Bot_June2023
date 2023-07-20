@@ -5,9 +5,9 @@ const standaloneContracts: string[] = ["TradeExecutor"];
 const ownerAddress = network.config.from;
 
 const {
-  GOERLI_POOL_ADDRESS_PROVIDER,
-  GOERLI_UNISWAP_ROUTER_ADDRESS,
-  GOERLI_SUSHISWAP_ROUTER_ADDRESS,
+  MAINNET_POOL_ADDRESS_PROVIDER,
+  MAINNET_UNISWAP_ROUTER_ADDRESS,
+  MAINNET_SUSHISWAP_ROUTER_ADDRESS,
 } = process.env;
 
 async function main() {
@@ -18,7 +18,7 @@ async function main() {
   const owner = await ethers.getSigner(ownerAddress);
 
   console.log(
-    `starting the deployment script, will deploy multiple contracts to the network: '${network.name}, 
+    `starting the deployment script, will deploy multiple contracts to the network: '${network.name}', 
      with owner set to: '${owner.address}'`
   );
 
@@ -78,7 +78,7 @@ async function deployArbitrageExecutor(
   const contractFactory = await ethers.getContractFactory(contractName);
 
   var contract = await contractFactory.deploy(
-    GOERLI_POOL_ADDRESS_PROVIDER!,
+    MAINNET_POOL_ADDRESS_PROVIDER!,
     tradeExecutorAddr
   );
 
@@ -99,8 +99,8 @@ async function deployArbitrageFinder(): Promise<string> {
   const contractFactory = await ethers.getContractFactory(contractName);
 
   var contract = await contractFactory.deploy(
-    GOERLI_UNISWAP_ROUTER_ADDRESS!,
-    GOERLI_SUSHISWAP_ROUTER_ADDRESS!
+    MAINNET_UNISWAP_ROUTER_ADDRESS!,
+    MAINNET_SUSHISWAP_ROUTER_ADDRESS!
   );
 
   contract = await contract.waitForDeployment();

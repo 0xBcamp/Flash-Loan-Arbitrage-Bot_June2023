@@ -8,6 +8,8 @@ const {
   GOERLI_ALCHEMY_URL,
   GOERLI_ALCHEMY_PRIVATE_KEY,
   GOERLI_ALCHEMY_OWNER_ADDRESS,
+  MAINNET_ALCHEMY_URL,
+  MAINNET_OWNER_ADDRESS,
 } = process.env;
 
 const config: HardhatUserConfig = {
@@ -26,6 +28,12 @@ const config: HardhatUserConfig = {
   },
   defaultNetwork: "localhost",
   networks: {
+    hardhat: {
+      forking: {
+        url: MAINNET_ALCHEMY_URL ?? "",
+      },
+      from: MAINNET_OWNER_ADDRESS,
+    },
     localhost: {
       url: "http://127.0.0.1:8545",
       from: LOCALHOST_OWNER_ADDRESS,

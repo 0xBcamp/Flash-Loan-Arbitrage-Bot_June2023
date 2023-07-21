@@ -10,6 +10,8 @@ contract ArbitrageBot is Whitelisted {
     IArbitrageFinder private immutable arbitrageFinder;
     IArbitrageExecutor private immutable arbitrageExecutor;
 
+    event ArbitrageOpportunity(bool indexed isFound);
+
     constructor(address _arbitragFinder, address _arbitrageExecutor) {
         arbitrageFinder = IArbitrageFinder(_arbitragFinder);
         arbitrageExecutor = IArbitrageExecutor(_arbitrageExecutor);
@@ -20,7 +22,9 @@ contract ArbitrageBot is Whitelisted {
             .find(token1, token2);
 
         if (isFound) {
+            emit ArbitrageOpportunity(true);
             arbitrageExecutor.execute(arbitrage);
         }
+        emit ArbitrageOpportunity(false);
     }
 }

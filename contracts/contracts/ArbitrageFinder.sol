@@ -12,17 +12,14 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
     IUniswapV2Router02 private immutable uniswapRouter;
     address private immutable uniswapRouterAddr;
 
-    IUniswapV2Router02 private immutable sushiSwapRouter;
-    address private immutable sushiSwapRouterAddr;
+    IUniswapV2Router02 private immutable veloSwapRouter;
+    address private immutable veloSwapRouterAddr;
 
-    constructor(
-        address _uniswapRouterAddress,
-        address _sushiSwapRouterAddress
-    ) {
+    constructor(address _uniswapRouterAddress, address _veloSwapRouterAddress) {
         uniswapRouter = IUniswapV2Router02(_uniswapRouterAddress);
         uniswapRouterAddr = _uniswapRouterAddress;
-        sushiSwapRouter = IUniswapV2Router02(_sushiSwapRouterAddress);
-        sushiSwapRouterAddr = _sushiSwapRouterAddress;
+        veloSwapRouter = IUniswapV2Router02(_veloSwapRouterAddress);
+        veloSwapRouterAddr = _veloSwapRouterAddress;
     }
 
     function find(
@@ -37,16 +34,16 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
     {
         Arbitrage.Opportunity memory arbitrage;
         uint256 uniswapPrice = getUniswapPrice(token1, token2);
-        uint256 sushiswapPrice = getSushiSwapPrice(token1, token2);
+        uint256 veloswapPrice = getVeloSwapPrice(token1, token2);
 
-        if (uniswapPrice > 0 && sushiswapPrice > 0) {
-            if (uniswapPrice > sushiswapPrice) {
-                if (isArbitrageEligable(uniswapPrice, sushiswapPrice)) {
+        if (uniswapPrice > 0 && veloswapPrice > 0) {
+            if (uniswapPrice > veloswapPrice) {
+                if (isArbitrageEligable(uniswapPrice, veloswapPrice)) {
                     arbitrage = Arbitrage.Opportunity(
                         Arbitrage.Transaction(
                             token1,
                             token2,
-                            sushiSwapRouterAddr,
+                            veloSwapRouterAddr,
                             10
                         ),
                         Arbitrage.Transaction(
@@ -59,7 +56,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
                     return (true, arbitrage);
                 }
             } else {
-                if (isArbitrageEligable(sushiswapPrice, uniswapPrice)) {
+                if (isArbitrageEligable(veloswapPrice, uniswapPrice)) {
                     arbitrage = Arbitrage.Opportunity(
                         Arbitrage.Transaction(
                             token1,
@@ -70,7 +67,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
                         Arbitrage.Transaction(
                             token2,
                             token1,
-                            sushiSwapRouterAddr,
+                            veloSwapRouterAddr,
                             0
                         )
                     );
@@ -111,7 +108,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
         }
     }
 
-    function getSushiSwapPrice(
+    function getVeloSwapPrice(
         address token1,
         address token2
     ) private view returns (uint256) {
@@ -119,7 +116,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
         path[0] = token1;
         path[1] = token2;
 
-        try sushiSwapRouter.getAmountsOut(1e18, path) returns (
+        try veloSwapRouter.getAmountsOut(1e18, path) returns (
             uint256[] memory amounts
         ) {
             return amounts[amounts.length - 1];

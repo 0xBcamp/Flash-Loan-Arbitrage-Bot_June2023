@@ -8,11 +8,16 @@ const {
   GOERLI_ALCHEMY_URL,
   GOERLI_ALCHEMY_PRIVATE_KEY,
   GOERLI_ALCHEMY_OWNER_ADDRESS,
+  OPTIMISM_ALCHEMY_URL,
+  MAINNET_ALCHEMY_URL,
 } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
+      {
+        version: "0.8.0",
+      },
       {
         version: "0.8.10",
       },
@@ -24,14 +29,16 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  defaultNetwork: "localhost",
+  defaultNetwork: "hardhat",
   networks: {
-    localhost: {
-      url: "http://127.0.0.1:8545",
-      from: LOCALHOST_OWNER_ADDRESS,
+    hardhat: {
+      chainId: 10,  // ganache-cli default chainId
+      forking: {
+        url: `${OPTIMISM_ALCHEMY_URL}`,
+      },
     },
-    optimismGoerli: {
-      url: `${GOERLI_ALCHEMY_URL}`,
+    optimism: {
+      url: `${OPTIMISM_ALCHEMY_URL}`,
       accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ALCHEMY_PRIVATE_KEY)}`],
       from: GOERLI_ALCHEMY_OWNER_ADDRESS,
       gasPrice: 100000000,

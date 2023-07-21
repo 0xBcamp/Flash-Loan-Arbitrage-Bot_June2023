@@ -46,18 +46,6 @@ const config: HardhatUserConfig = {
       from: GOERLI_ALCHEMY_OWNER_ADDRESS,
       gasPrice: 100000000,
     },
-    goerli: {
-      url: `${GOERLI_ALCHEMY_URL}`,
-      accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ACCOUNT_PRIVATE_KEY)}`],
-      from: GOERLI_ACCOUNT_OWNER_ADDRESS,
-      gasPrice: 100000000,
-    },
-    mainnet: {
-      url: `${MAINNET_ALCHEMY_URL}`,
-      accounts: [`0x${fetchEthAccountPrivateKey(MAINNET_ACCOUNT_PRIVATE_KEY)}`],
-      from: MAINNET_OWNER_ADDRESS,
-      gasPrice: 2000000000,
-    },
   },
 };
 

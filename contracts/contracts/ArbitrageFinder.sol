@@ -39,7 +39,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
 
         if (uniswapPrice > 0 && veloswapPrice > 0) {
             if (uniswapPrice > veloswapPrice) {
-                if (isArbitrageEligable(uniswapPrice, veloswapPrice)) {
+                if (isArbitrageEligible(uniswapPrice, veloswapPrice, 10)) {
                     arbitrage = Arbitrage.Opportunity(
                         Arbitrage.Transaction(
                             token1,
@@ -57,7 +57,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
                     return (true, arbitrage);
                 }
             } else {
-                if (isArbitrageEligable(veloswapPrice, uniswapPrice)) {
+                if (isArbitrageEligible(veloswapPrice, uniswapPrice, 0)) {
                     arbitrage = Arbitrage.Opportunity(
                         Arbitrage.Transaction(
                             token1,

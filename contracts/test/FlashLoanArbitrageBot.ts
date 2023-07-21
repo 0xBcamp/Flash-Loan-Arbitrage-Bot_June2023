@@ -83,7 +83,7 @@ describe("ArbitrageFinder", () => {
     console.log("Before swap %s", await daiToken.balanceOf(deployer.address));
     console.log("Swapping function...");
     await wethToken.approve(tradeExecutor.target, ethers.parseEther("10"));
-    await tradeExecutor.executeTrade(uniswapRouterAddress, wethToken.target, daiToken.target, ethers.parseEther("10"));
+    await tradeExecutor.executeTrade(veloRouterAddress, wethToken.target, daiToken.target, ethers.parseEther("10"));
     console.log("After swap %s", await wethToken.balanceOf(deployer.address));
     console.log("After swap %s", await daiToken.balanceOf(deployer.address));
 

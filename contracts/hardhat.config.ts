@@ -5,11 +5,15 @@ import * as crypto from "crypto";
 
 const {
   LOCALHOST_OWNER_ADDRESS,
+  OPT_GOERLI_ALCHEMY_URL,
+  OPT_GOERLI_ACCOUNT_PRIVATE_KEY,
+  OPT_GOERLI_ACCOUNT_OWNER_ADDRESS,
   GOERLI_ALCHEMY_URL,
-  GOERLI_ALCHEMY_PRIVATE_KEY,
-  GOERLI_ALCHEMY_OWNER_ADDRESS,
+  GOERLI_ACCOUNT_PRIVATE_KEY,
+  GOERLI_ACCOUNT_OWNER_ADDRESS,
   MAINNET_ALCHEMY_URL,
   MAINNET_OWNER_ADDRESS,
+  MAINNET_ACCOUNT_PRIVATE_KEY,
 } = process.env;
 
 const config: HardhatUserConfig = {
@@ -26,7 +30,7 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  defaultNetwork: "localhost",
+  defaultNetwork: "optimismGoerli",
   networks: {
     hardhat: {
       forking: {
@@ -39,15 +43,30 @@ const config: HardhatUserConfig = {
       from: LOCALHOST_OWNER_ADDRESS,
     },
     optimismGoerli: {
-      url: `${GOERLI_ALCHEMY_URL}`,
-      accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ALCHEMY_PRIVATE_KEY)}`],
-      from: GOERLI_ALCHEMY_OWNER_ADDRESS,
+      url: `${OPT_GOERLI_ALCHEMY_URL}`,
+      accounts: [
+        `0x${fetchEthAccountPrivateKey(OPT_GOERLI_ACCOUNT_PRIVATE_KEY)}`,
+      ],
+      from: OPT_GOERLI_ACCOUNT_OWNER_ADDRESS,
       gasPrice: 100000000,
+    },
+    goerli: {
+      url: `${GOERLI_ALCHEMY_URL}`,
+      accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ACCOUNT_PRIVATE_KEY)}`],
+      from: GOERLI_ACCOUNT_OWNER_ADDRESS,
+      gasPrice: 100000000,
+    },
+    mainnet: {
+      url: `${MAINNET_ALCHEMY_URL}`,
+      accounts: [`0x${fetchEthAccountPrivateKey(MAINNET_ACCOUNT_PRIVATE_KEY)}`],
+      from: MAINNET_OWNER_ADDRESS,
+      gasPrice: 2000000000,
     },
   },
 };
 
 function fetchEthAccountPrivateKey(pvtKeyEnvVar: string | undefined): string {
+  console.log(pvtKeyEnvVar);
   if (pvtKeyEnvVar) {
     console.log("private key was set as environment variable");
     return pvtKeyEnvVar;

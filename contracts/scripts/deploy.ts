@@ -2,24 +2,20 @@ import { ethers, network } from "hardhat";
 
 const standaloneContracts: string[] = ["TradeExecutor"];
 
-const ownerAddress = network.config.from;
-
 const {
-  MAINNET_POOL_ADDRESS_PROVIDER,
-  MAINNET_UNISWAP_ROUTER_ADDRESS,
-  MAINNET_SUSHISWAP_ROUTER_ADDRESS,
+  AAVE_POOL_ADDRESS_PROVIDER,
+  UNISWAP_ROUTER_ADDRESS,
+  SUSHISWAP_ROUTER_ADDRESS,
 } = process.env;
 
 async function main() {
-  if (ownerAddress === undefined) {
-    throw new Error("owner address must be set in configuration");
-  }
-
-  const owner = await ethers.getSigner(ownerAddress);
+  const [signer] = await ethers.getSigners();
+  const provider = ethers.provider;
+  const signerBalance = await provider.getBalance(signer.address);
 
   console.log(
     `starting the deployment script, will deploy multiple contracts to the network: '${network.name}', 
-     with owner set to: '${owner.address}'`
+     with owner set to: '${signer.address}', balance: '${signerBalance}'`
   );
 
   deployContracts();
@@ -78,7 +74,7 @@ async function deployArbitrageExecutor(
   const contractFactory = await ethers.getContractFactory(contractName);
 
   var contract = await contractFactory.deploy(
-    MAINNET_POOL_ADDRESS_PROVIDER!,
+    AAVE_POOL_ADDRESS_PROVIDER!,
     tradeExecutorAddr
   );
 
@@ -99,8 +95,8 @@ async function deployArbitrageFinder(): Promise<string> {
   const contractFactory = await ethers.getContractFactory(contractName);
 
   var contract = await contractFactory.deploy(
-    MAINNET_UNISWAP_ROUTER_ADDRESS!,
-    MAINNET_SUSHISWAP_ROUTER_ADDRESS!
+    UNISWAP_ROUTER_ADDRESS!,
+    SUSHISWAP_ROUTER_ADDRESS!
   );
 
   contract = await contract.waitForDeployment();

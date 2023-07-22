@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IconButton, ActivityIndicator } from "react-native-paper";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { styles } from "./LoginView.styles";
 import { WalletContext } from "contexts/WalletContext";
 
@@ -14,8 +14,8 @@ export const LoginView: React.FC<Props> = () => {
     <View style={styles.container}>
       <ActivityIndicator animating={isLoading} size={100}></ActivityIndicator>
       <IconButton
-        mode="outlined"
-        icon={require("../../../assets/metamask.png")}
+        mode="contained"
+        icon={require("../../../assets/logo.png")}
         size={100}
         disabled={isLoading}
         style={styles.button}

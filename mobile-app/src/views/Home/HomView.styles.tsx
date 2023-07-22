@@ -5,18 +5,15 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: CombinedDarkTheme.colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonGroupContainer: {
-    flexDirection: "row",
   },
   text: {
     color: CombinedDarkTheme.colors.notification,
-    fontSize: 20,
   },
-  button: {},
+  button: {
+    backgroundColor: CombinedDarkTheme.colors.background,
+    bottom: -340,
+  },
   buttonContainer: {
-    flex: 1,
+    alignItems: "center",
   },
 });

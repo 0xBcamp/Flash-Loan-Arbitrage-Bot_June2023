@@ -11,5 +11,6 @@ export const styles = StyleSheet.create({
   button: {
     position: "absolute",
     bottom: 150,
+    backgroundColor: CombinedDarkTheme.colors.background,
   },
 });

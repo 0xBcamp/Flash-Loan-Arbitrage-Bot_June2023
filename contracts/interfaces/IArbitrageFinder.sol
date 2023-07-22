@@ -7,5 +7,5 @@ interface IArbitrageFinder {
     function find(
         address token1,
         address token2
-    ) external view returns (bool, Arbitrage.Opportunity memory);
+    ) external returns (bool, Arbitrage.Opportunity memory);
 }

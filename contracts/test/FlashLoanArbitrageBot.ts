@@ -73,21 +73,33 @@ describe("ArbitrageFinder", () => {
   it("1. should find arbitrage opportunity", async () => {
 
     const { arbitrageFinder, tradeExecutor, wethToken, daiToken, deployer } = await beforeIt();
+    const ethToSwap = ethers.parseEther("10");
 
     // Call the find function
     await arbitrageFinder.addToWhitelist(deployer.address);
     await tradeExecutor.addToWhitelist(deployer.address);
-    await tradeExecutor.getWethFromEth(networkConfig[chainId]["weth"], { value: ethers.parseEther("12") });
+    await tradeExecutor.getWethFromEth(networkConfig[chainId]["weth"], { value: ethToSwap });
     /* Make arbitrage opportunity */
     console.log("Before swap %s", await wethToken.balanceOf(deployer.address));
     console.log("Before swap %s", await daiToken.balanceOf(deployer.address));
-    console.log("Swapping function...");
-    await wethToken.approve(tradeExecutor.target, ethers.parseEther("10"));
-    await tradeExecutor.executeTrade(veloRouterAddress, wethToken.target, daiToken.target, ethers.parseEther("10"));
+    await arbitrageFinder.establishUniswapPrice(wethToken.target, daiToken.target);
+    let uniswapPrice = await arbitrageFinder.getUniswapPrice();
+    let veloPrice = await arbitrageFinder.getVeloSwapPrice(wethToken.target, daiToken.target);
+    console.log("Uniswap price before: ", ethers.formatEther(uniswapPrice.toString()));
+    console.log("Velo price before: ", ethers.formatEther(veloPrice.toString()));
+
+    console.log("Making arbitrage opportunity...");
+    await wethToken.approve(tradeExecutor.target, ethToSwap);
+    await tradeExecutor.executeTrade(uniswapRouterAddress, wethToken.target, daiToken.target, ethToSwap);
+
     console.log("After swap %s", await wethToken.balanceOf(deployer.address));
     console.log("After swap %s", await daiToken.balanceOf(deployer.address));
-
-    const [found, opportunity] = await arbitrageFinder.find(daiToken.target, wethToken.target);
+    await arbitrageFinder.establishUniswapPrice(wethToken.target, daiToken.target);
+    uniswapPrice = await arbitrageFinder.getUniswapPrice();
+    veloPrice = await arbitrageFinder.getVeloSwapPrice(wethToken.target, daiToken.target);
+    console.log("Uniswap price after: ", ethers.formatEther(uniswapPrice.toString()));
+    console.log("Velo price after: ", ethers.formatEther(veloPrice.toString()));
+    const [found, opportunity] = await arbitrageFinder.find(daiToken.target, wethToken.target, uniswapPrice, veloPrice);
 
     // Assert the result
     expect(found).to.be.true;

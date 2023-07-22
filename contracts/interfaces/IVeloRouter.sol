@@ -27,4 +27,10 @@ interface IVeloRouter {
         uint amountIn,
         route[] memory routes
     ) external view returns (uint[] memory amounts);
+
+    function getReserves(
+        address tokenA,
+        address tokenB,
+        bool stable
+    ) external view returns (uint reserveA, uint reserveB);
 }

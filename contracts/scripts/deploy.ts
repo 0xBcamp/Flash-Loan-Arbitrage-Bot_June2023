@@ -1,11 +1,10 @@
 import { ethers, network } from "hardhat";
 
-const standaloneContracts: string[] = ["TradeExecutor"];
-
 const {
   AAVE_POOL_ADDRESS_PROVIDER,
-  UNISWAP_ROUTER_ADDRESS,
-  SUSHISWAP_ROUTER_ADDRESS,
+  UNISWAP_V3_QUOTER,
+  UNISWAP_V3_SWAP_ROUTER,
+  VELO_ROUTER,
 } = process.env;
 
 async function main() {
@@ -22,9 +21,9 @@ async function main() {
 }
 
 async function deployContracts() {
-  const contractNameAddr = await deployStandaloneContracts();
-  const tradeExecutorAddr = await deployArbitrageExecutor(
-    contractNameAddr.get("TradeExecutor")!
+  const tradeExecutorAddr = await deployTradeExecutor();
+  const arbitrageExecutorAddr = await deployArbitrageExecutor(
+    tradeExecutorAddr
   );
   const arbitrageFinderAddr = await deployArbitrageFinder();
 
@@ -35,7 +34,7 @@ async function deployContracts() {
 
   var contract = await contractFactory.deploy(
     arbitrageFinderAddr,
-    tradeExecutorAddr
+    arbitrageExecutorAddr
   );
 
   contract = await contract.waitForDeployment();
@@ -45,24 +44,25 @@ async function deployContracts() {
   );
 }
 
-async function deployStandaloneContracts(): Promise<Map<string, string>> {
-  const contractNameAddr = new Map<string, string>();
+async function deployTradeExecutor(): Promise<string> {
+  const contractName = "TradeExecutor";
+  console.log(`deploying ${contractName} contract`);
 
-  for (const contractName of standaloneContracts) {
-    console.log(`deploying contract: '${contractName}'`);
-    const contractFactory = await ethers.getContractFactory(contractName);
+  const contractFactory = await ethers.getContractFactory(contractName);
 
-    var contract = await contractFactory.deploy();
-    contract = await contract.waitForDeployment();
+  var contract = await contractFactory.deploy(
+    UNISWAP_V3_SWAP_ROUTER!,
+    VELO_ROUTER!
+  );
 
-    const addr: string = await contract.getAddress();
-    console.log(
-      `contract with name ${contractName} was deployed to address: ${addr}`
-    );
-    contractNameAddr.set(contractName, addr);
-  }
+  contract = await contract.waitForDeployment();
 
-  return contractNameAddr;
+  const address = await contract.getAddress();
+  console.log(
+    `contract with name ${contractName} was deployed to address: ${address}`
+  );
+
+  return address;
 }
 
 async function deployArbitrageExecutor(
@@ -94,10 +94,7 @@ async function deployArbitrageFinder(): Promise<string> {
 
   const contractFactory = await ethers.getContractFactory(contractName);
 
-  var contract = await contractFactory.deploy(
-    UNISWAP_ROUTER_ADDRESS!,
-    SUSHISWAP_ROUTER_ADDRESS!
-  );
+  var contract = await contractFactory.deploy(UNISWAP_V3_QUOTER!, VELO_ROUTER!);
 
   contract = await contract.waitForDeployment();
 

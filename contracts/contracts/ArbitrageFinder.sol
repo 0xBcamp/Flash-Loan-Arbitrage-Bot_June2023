@@ -1,29 +1,27 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.2 <=0.8.19;
+pragma solidity ^0.8.0;
 
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/IQuoter.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IArbitrageFinder.sol";
 import "../lib/Arbitrage.sol";
 import "./Whitelisted.sol";
+import "../interfaces/IVeloRouter.sol";
 
 contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
     uint PRICE_TOLERANCE_PERCENT = 2;
 
-    IUniswapV2Router02 private immutable uniswapRouter;
-    address private immutable uniswapRouterAddr;
+    IQuoter private immutable uniswapQuoter;
+    address private immutable uniswapQuoterAddr;
 
-    IUniswapV2Router02 private immutable sushiSwapRouter;
-    address private immutable sushiSwapRouterAddr;
+    IVeloRouter private immutable veloRouter;
+    address private immutable veloRouterAddr;
 
-    constructor(
-        address _uniswapRouterAddress,
-        address _sushiSwapRouterAddress
-    ) {
-        uniswapRouter = IUniswapV2Router02(_uniswapRouterAddress);
-        uniswapRouterAddr = _uniswapRouterAddress;
-        sushiSwapRouter = IUniswapV2Router02(_sushiSwapRouterAddress);
-        sushiSwapRouterAddr = _sushiSwapRouterAddress;
+    constructor(address _uniswapQuoterAddress, address _veloRouterAddr) {
+        uniswapQuoter = IQuoter(_uniswapQuoterAddress);
+        uniswapQuoterAddr = _uniswapQuoterAddress;
+        veloRouter = IVeloRouter(_veloRouterAddr);
+        veloRouterAddr = _veloRouterAddr;
     }
 
     function find(
@@ -31,72 +29,47 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
         address token2
     )
         external
-        view
         override
         onlyWhitelisted
         returns (bool, Arbitrage.Opportunity memory)
     {
-        uint256 uniswapPrice = getTokenPrice(uniswapRouterAddr, token1, token2);
-        uint256 sushiswapPrice = getTokenPrice(
-            sushiSwapRouterAddr,
-            token1,
-            token2
-        );
+        uint256 uniswapPrice = getUniswapPrice(token1, token2);
+        uint256 voleswapPrice = getVeloSwapPrice(token1, token2);
 
-        if (uniswapPrice > 0 && sushiswapPrice > 0) {
-            uint256 effectiveTokenBalance = getEffectiveTokenBalance(
-                uniswapRouterAddr,
-                token1,
-                token2
-            );
-
-            uint256 tradeAmount = (effectiveTokenBalance * 10) / 100; // 10% of the effective token balance
-
-            if (uniswapPrice > sushiswapPrice) {
-                if (
-                    isArbitrageEligible(
-                        uniswapPrice,
-                        sushiswapPrice,
-                        tradeAmount
-                    )
-                ) {
+        if (uniswapPrice > 0 && voleswapPrice > 0) {
+            if (uniswapPrice > voleswapPrice) {
+                if (isArbitrageEligible(uniswapPrice, voleswapPrice, 10)) {
                     Arbitrage.Opportunity memory arbitrage = Arbitrage
                         .Opportunity(
                             Arbitrage.Transaction(
                                 token1,
                                 token2,
-                                sushiSwapRouterAddr,
-                                tradeAmount
+                                veloRouterAddr,
+                                10
                             ),
                             Arbitrage.Transaction(
                                 token2,
                                 token1,
-                                uniswapRouterAddr,
+                                uniswapQuoterAddr,
                                 0
                             )
                         );
                     return (true, arbitrage);
                 }
             } else {
-                if (
-                    isArbitrageEligible(
-                        sushiswapPrice,
-                        uniswapPrice,
-                        tradeAmount
-                    )
-                ) {
+                if (isArbitrageEligible(voleswapPrice, uniswapPrice, 10)) {
                     Arbitrage.Opportunity memory arbitrage = Arbitrage
                         .Opportunity(
                             Arbitrage.Transaction(
                                 token1,
                                 token2,
-                                uniswapRouterAddr,
-                                tradeAmount
+                                uniswapQuoterAddr,
+                                10
                             ),
                             Arbitrage.Transaction(
                                 token2,
                                 token1,
-                                sushiSwapRouterAddr,
+                                veloRouterAddr,
                                 0
                             )
                         );
@@ -114,37 +87,31 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
         );
     }
 
-    function getTokenPrice(
-        address routerAddress,
-        address token1,
-        address token2
+    function getVeloSwapPrice(
+        address tokenIn,
+        address tokenOut
     ) private view returns (uint256) {
-        IUniswapV2Router02 router = IUniswapV2Router02(routerAddress);
-        address[] memory path = new address[](2);
-        path[0] = token1;
-        path[1] = token2;
-
-        try router.getAmountsOut(1e18, path) returns (
-            uint256[] memory amounts
-        ) {
-            return amounts[amounts.length - 1];
-        } catch {
-            return 0;
-        }
+        (uint reserveA, uint reserveB) = veloRouter.getReserves(
+            tokenIn,
+            tokenOut,
+            false
+        );
+        uint256 amounts = (reserveB * 10 ** 18) / reserveA;
+        return amounts;
     }
 
-    function getEffectiveTokenBalance(
-        address routerAddress,
-        address token1,
-        address token2
-    ) private view returns (uint256) {
-        IUniswapV2Router02 router = IUniswapV2Router02(routerAddress);
-        IERC20 token = IERC20(token1);
-
-        uint256 balance1 = token.balanceOf(address(router));
-        uint256 balance2 = token.balanceOf(token2);
-
-        return balance1 < balance2 ? balance1 : balance2;
+    function getUniswapPrice(
+        address tokenIn,
+        address tokenOut
+    ) private returns (uint256) {
+        uint256 amountOut = uniswapQuoter.quoteExactInputSingle(
+            tokenIn,
+            tokenOut,
+            3000,
+            1e18,
+            0
+        );
+        return amountOut;
     }
 
     function isArbitrageEligible(

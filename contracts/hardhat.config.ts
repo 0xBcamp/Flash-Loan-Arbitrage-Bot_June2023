@@ -41,7 +41,7 @@ const config: HardhatUserConfig = {
       accounts: [
         `0x${fetchEthAccountPrivateKey(OPT_GOERLI_ACCOUNT_PRIVATE_KEY)}`,
       ],
-      gasPrice: 100000000,
+      gasPrice: 110000000,
     },
     optimismMainnet: {
       url: `${OPT_MAINNET_ALCHEMY_URL}`,

@@ -13,6 +13,25 @@ const {
   VELO_ROUTER,
 } = process.env;
 
+export class Contracts {
+  bot: ArbitrageBot;
+  executor: ArbitrageExecutor;
+  finder: ArbitrageFinder;
+  tradeExecutor: TradeExecutor;
+
+  constructor(
+    bot: ArbitrageBot,
+    executor: ArbitrageExecutor,
+    finder: ArbitrageFinder,
+    tradeExecutor: TradeExecutor
+  ) {
+    this.bot = bot;
+    this.executor = executor;
+    this.finder = finder;
+    this.tradeExecutor = tradeExecutor;
+  }
+}
+
 async function main() {
   const [signer] = await ethers.getSigners();
   const provider = ethers.provider;
@@ -26,7 +45,7 @@ async function main() {
   deployContracts();
 }
 
-async function deployContracts() {
+export async function deployContracts(): Promise<Contracts> {
   const tradeExecutor = await deployTradeExecutor();
   const arbitrageExecutor = await deployArbitrageExecutor(
     await tradeExecutor.getAddress()
@@ -43,6 +62,13 @@ async function deployContracts() {
   await arbitrageExecutor.addToWhitelist(await arbitrageBot.getAddress());
   await arbitrageFinder.addToWhitelist(await arbitrageBot.getAddress());
   await tradeExecutor.addToWhitelist(await arbitrageExecutor.getAddress());
+
+  return new Contracts(
+    arbitrageBot,
+    arbitrageExecutor,
+    arbitrageFinder,
+    tradeExecutor
+  );
 }
 
 async function deployTradeExecutor(): Promise<TradeExecutor> {

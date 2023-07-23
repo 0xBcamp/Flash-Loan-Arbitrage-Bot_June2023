@@ -15,6 +15,7 @@ import { delay } from "src/utils/time";
 import {
   isAccountWhitelisted,
   whitelistAccount,
+  removeAccountFromWhitelist,
   launchArbitrage,
 } from "services/arbitrage";
 import { useWalletConnectModal } from "@walletconnect/modal-react-native";
@@ -46,7 +47,7 @@ export const HomeView: React.FC<Props> = () => {
   React.useEffect(() => {
     const bootstrapAsync = async (provider: any) => {
       setState({ isLoading: true, isWhitelisted: undefined });
-      await delay(3000);
+      await delay(2500);
       const isWhitelisted = await isAccountWhitelisted(provider);
       setState({ isLoading: false, isWhitelisted: isWhitelisted });
       setVisible({ isVisible: true });
@@ -87,6 +88,36 @@ export const HomeView: React.FC<Props> = () => {
               Your account is not whitelisted`}</Text>
             )}
           </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              disabled={state.isLoading}
+              onPress={async () => {
+                if (state.isWhitelisted == true) {
+                  setState({
+                    isLoading: true,
+                  });
+                  await removeAccountFromWhitelist(provider);
+                  setState({
+                    isLoading: false,
+                    isWhitelisted: false,
+                  });
+                } else {
+                  setState({
+                    isLoading: true,
+                  });
+                  await whitelistAccount(provider);
+                  setState({
+                    isLoading: false,
+                    isWhitelisted: true,
+                  });
+                }
+              }}
+            >
+              {state.isWhitelisted
+                ? "Remove from whitelist"
+                : "Add to Whitelist"}
+            </Button>
+          </Dialog.Actions>
         </Dialog>
       </Portal>
       <ActivityIndicator
@@ -96,19 +127,15 @@ export const HomeView: React.FC<Props> = () => {
       <View style={styles.buttonContainer}>
         <IconButton
           style={styles.button}
-          icon={state.isWhitelisted ? "rocket-launch" : "paper-roll-outline"}
+          icon={"rocket-launch"}
           mode="contained"
           size={100}
-          disabled={state.isLoading}
+          disabled={state.isWhitelisted == false}
           onPress={async () => {
             setState({
               isLoading: true,
             });
-            if (state.isWhitelisted == true) {
-              await launchArbitrage(provider);
-            } else {
-              await whitelistAccount(provider);
-            }
+            await launchArbitrage(provider);
             setState({
               isLoading: false,
             });

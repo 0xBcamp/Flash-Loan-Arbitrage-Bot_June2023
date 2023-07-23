@@ -21,7 +21,11 @@ export const LoginView: React.FC<Props> = () => {
         style={styles.button}
         onPress={async (e) => {
           setIsLoading(true);
-          await walletContext.connect();
+          try {
+            await walletContext.connect();
+          } catch (error) {
+            console.log(error);
+          }
           setIsLoading(false);
         }}
       />

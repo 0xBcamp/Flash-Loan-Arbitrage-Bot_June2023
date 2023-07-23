@@ -1,22 +1,13 @@
 import { ethers } from "ethers";
-import { GoerliBotAddress, MainnetBotAddress } from "src/constants/contract";
+import { BotAddress } from "src/constants/contract";
 import { botAbi } from "src/constants/abi";
-import {
-  GoerliUSDC,
-  GoerliWETH,
-  MainnetUSDC,
-  MainnetWETH,
-} from "src/constants/currency";
+import { USDC, WETH } from "src/constants/currency";
 
 export const isAccountWhitelisted = async (provider: any): Promise<boolean> => {
   try {
     const web3Provider = new ethers.providers.Web3Provider(provider);
 
-    const contract = new ethers.Contract(
-      GoerliBotAddress,
-      botAbi,
-      web3Provider
-    );
+    const contract = new ethers.Contract(BotAddress, botAbi, web3Provider);
 
     const address = await web3Provider.getSigner().getAddress();
 
@@ -36,7 +27,7 @@ export const whitelistAccount = async (provider: any): Promise<void> => {
     const web3Provider = new ethers.providers.Web3Provider(provider);
     const signer = web3Provider.getSigner();
 
-    const contract = new ethers.Contract(GoerliBotAddress, botAbi, signer);
+    const contract = new ethers.Contract(BotAddress, botAbi, signer);
 
     const address = await signer.getAddress();
     console.log(`will whitelist address: ${address}`);
@@ -56,7 +47,7 @@ export const removeAccountFromWhitelist = async (
     const web3Provider = new ethers.providers.Web3Provider(provider);
     const signer = web3Provider.getSigner();
 
-    const contract = new ethers.Contract(GoerliBotAddress, botAbi, signer);
+    const contract = new ethers.Contract(BotAddress, botAbi, signer);
 
     const address = await signer.getAddress();
     console.log(`will remove from whitelist address: ${address}`);
@@ -69,27 +60,26 @@ export const removeAccountFromWhitelist = async (
   }
 };
 
-export const launchArbitrage = async (provider: any): Promise<void> => {
+export const launchArbitrage = async (provider: any): Promise<boolean> => {
   try {
     const web3Provider = new ethers.providers.Web3Provider(provider);
     const signer = await web3Provider.getSigner();
 
-    const contract = new ethers.Contract(GoerliBotAddress, botAbi, signer);
+    const contract = new ethers.Contract(BotAddress, botAbi, signer);
 
-    const estimatedGas = await contract.estimateGas.execute(
-      GoerliUSDC,
-      GoerliWETH
-    );
     console.log(`launching arbitrage bot`);
+    var isFound: boolean = false;
 
-    const estimateGasNumber = Number(ethers.utils.formatEther(estimatedGas));
-
-    console.log(`launching arbitrage bot with gas limit: ${estimateGasNumber}`);
-
-    await contract.execute(GoerliUSDC, GoerliWETH, {
-      gasLimit: Math.ceil(estimateGasNumber * 1.1),
+    await contract.execute(WETH, USDC);
+    await contract.on("ArbitrageOpportunity", (found: boolean) => {
+      console.log(found);
+      isFound = found;
+      return;
     });
+
+    return isFound;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };

@@ -95,7 +95,11 @@ async function deployArbitrageFinder(): Promise<ArbitrageFinder> {
 
   const contractFactory = await ethers.getContractFactory(contractName);
 
-  var contract = await contractFactory.deploy(UNISWAP_V3_QUOTER!, VELO_ROUTER!);
+  var contract = await contractFactory.deploy(
+    UNISWAP_V3_QUOTER!,
+    UNISWAP_V3_SWAP_ROUTER!,
+    VELO_ROUTER!
+  );
 
   contract = await contract.waitForDeployment();
 

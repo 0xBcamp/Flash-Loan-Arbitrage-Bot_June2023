@@ -13,13 +13,19 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
 
     IQuoter private immutable uniswapQuoter;
     address private immutable uniswapQuoterAddr;
+    address private immutable uniswapRouterAddr;
 
     IVeloRouter private immutable veloRouter;
     address private immutable veloRouterAddr;
 
-    constructor(address _uniswapQuoterAddress, address _veloRouterAddr) {
+    constructor(
+        address _uniswapQuoterAddress,
+        address _uniswapRouterAddress,
+        address _veloRouterAddr
+    ) {
         uniswapQuoter = IQuoter(_uniswapQuoterAddress);
         uniswapQuoterAddr = _uniswapQuoterAddress;
+        uniswapRouterAddr = _uniswapRouterAddress;
         veloRouter = IVeloRouter(_veloRouterAddr);
         veloRouterAddr = _veloRouterAddr;
     }
@@ -50,7 +56,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
                             Arbitrage.Transaction(
                                 token2,
                                 token1,
-                                uniswapQuoterAddr,
+                                uniswapRouterAddr,
                                 0
                             )
                         );
@@ -63,7 +69,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
                             Arbitrage.Transaction(
                                 token1,
                                 token2,
-                                uniswapQuoterAddr,
+                                uniswapRouterAddr,
                                 10
                             ),
                             Arbitrage.Transaction(

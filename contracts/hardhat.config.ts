@@ -48,7 +48,6 @@ const config: HardhatUserConfig = {
       accounts: [
         `0x${fetchEthAccountPrivateKey(OPT_MAINNET_ACCOUNT_PRIVATE_KEY)}`,
       ],
-      gasPrice: 100000000,
     },
   },
 };

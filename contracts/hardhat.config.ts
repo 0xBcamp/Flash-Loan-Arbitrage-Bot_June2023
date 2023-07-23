@@ -21,10 +21,14 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  defaultNetwork: "optimismGoerli",
+  defaultNetwork: "hardhat",
+  mocha: {
+    timeout: 100 * 1000,
+  },
   networks: {
     hardhat: {
       forking: {
+        enabled: true,
         url: `${OPT_MAINNET_ALCHEMY_URL}`,
       },
       accounts: [

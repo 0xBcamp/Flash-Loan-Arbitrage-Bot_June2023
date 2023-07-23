@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { BotAddress } from "src/constants/contract";
 import { botAbi } from "src/constants/abi";
 import { USDC, WETH } from "src/constants/currency";
+import { delay } from "src/utils/time";
 
 export const isAccountWhitelisted = async (provider: any): Promise<boolean> => {
   try {
@@ -65,18 +66,20 @@ export const launchArbitrage = async (provider: any): Promise<boolean> => {
     const web3Provider = new ethers.providers.Web3Provider(provider);
     const signer = await web3Provider.getSigner();
 
-    const contract = new ethers.Contract(BotAddress, botAbi, signer);
+    var isFound: boolean = true;
 
-    console.log(`launching arbitrage bot`);
-    var isFound: boolean = false;
-
-    await contract.execute(WETH, USDC);
-    await contract.on("ArbitrageOpportunity", (found: boolean) => {
+    let contract = new ethers.Contract(BotAddress, botAbi, signer);
+    contract = await contract.on("ArbitrageOpportunity", (found: boolean) => {
       console.log(found);
       isFound = found;
-      return;
+      return isFound;
     });
 
+    console.log(`launching arbitrage bot`);
+
+    await contract.execute(WETH, USDC);
+    await delay(3000);
+    
     return isFound;
   } catch (error) {
     console.log(error);

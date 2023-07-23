@@ -54,11 +54,21 @@ contract ArbitrageExecutor is
             Arbitrage.Transaction memory secondTransation
         ) = abi.decode(params, (Arbitrage.Transaction, Arbitrage.Transaction));
 
+        IERC20(firstTransaction.tokenFrom).approve(
+            address(tradeExecutor),
+            firstTransaction.amount
+        );
+
         uint256 amountPurchased = tradeExecutor.executeTrade(
             firstTransaction.exchange,
             firstTransaction.tokenFrom,
             firstTransaction.tokenTo,
             firstTransaction.amount
+        );
+
+        IERC20(secondTransation.tokenFrom).approve(
+            address(tradeExecutor),
+            amountPurchased
         );
 
         tradeExecutor.executeTrade(

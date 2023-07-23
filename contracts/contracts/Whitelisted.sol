@@ -7,7 +7,6 @@ abstract contract Whitelisted {
 
     constructor() {
         owner = msg.sender;
-        whitelist[owner] = true;
     }
 
     modifier onlyOwner() {

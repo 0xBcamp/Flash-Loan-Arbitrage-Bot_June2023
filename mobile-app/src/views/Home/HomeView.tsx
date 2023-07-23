@@ -28,6 +28,11 @@ type State = {
 type DialogState = {
   isVisible: boolean;
 };
+
+type OpportunityState = {
+  isFound: boolean | undefined;
+  isError: boolean;
+};
 type Props = {};
 
 export const HomeView: React.FC<Props> = () => {
@@ -35,11 +40,22 @@ export const HomeView: React.FC<Props> = () => {
     isLoading: false,
     isWhitelisted: undefined,
   });
+
   const [dialogState, setVisible] = useState<DialogState>({
     isVisible: false,
   });
 
+  const [oppDialogState, setOppVisible] = useState<DialogState>({
+    isVisible: false,
+  });
+
+  const [opportunity, setOpportunity] = useState<OpportunityState>({
+    isFound: undefined,
+    isError: false,
+  });
+
   const hideDialog = () => setVisible({ isVisible: false });
+  const hideOppDialog = () => setOppVisible({ isVisible: false });
 
   const walletContext = React.useContext(WalletContext);
   const { provider } = useWalletConnectModal();
@@ -119,6 +135,23 @@ export const HomeView: React.FC<Props> = () => {
             </Button>
           </Dialog.Actions>
         </Dialog>
+        <Dialog visible={oppDialogState.isVisible} onDismiss={hideOppDialog}>
+          <Dialog.Content>
+            {opportunity.isFound && !opportunity.isError && (
+              <Text style={styles.text}>Arbitrage opportunity was found!</Text>
+            )}
+            {!opportunity.isFound && !opportunity.isError && (
+              <Text style={styles.text}>
+                Unfortunately arbitrage opportunity was not found
+              </Text>
+            )}
+            {opportunity.isError && (
+              <Text style={styles.errText}>
+                Woooops something went seriously wrong!
+              </Text>
+            )}
+          </Dialog.Content>
+        </Dialog>
       </Portal>
       <ActivityIndicator
         animating={state.isLoading}
@@ -130,15 +163,31 @@ export const HomeView: React.FC<Props> = () => {
           icon={"rocket-launch"}
           mode="contained"
           size={100}
-          disabled={state.isWhitelisted == false}
+          disabled={state.isWhitelisted == false || state.isLoading}
           onPress={async () => {
             setState({
               isLoading: true,
             });
-            await launchArbitrage(provider);
-            setState({
-              isLoading: false,
-            });
+            try {
+              const isFound = await launchArbitrage(provider);
+              setOpportunity({
+                isFound: isFound,
+                isError: false,
+              });
+            } catch {
+              console.log("error is here");
+              setOpportunity({
+                isFound: false,
+                isError: true,
+              });
+            } finally {
+              setState({
+                isLoading: false,
+              });
+              setOppVisible({
+                isVisible: true,
+              });
+            }
           }}
         ></IconButton>
       </View>

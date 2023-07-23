@@ -1,14 +1,15 @@
-export const GoerliBotAddress = "0xB4e2841F8DF81516D0F6318A1F1363E28BE92f33";
-export const GoerliFinderAddress = "0x55f892be15a649De649ecAB6A1f15DA7419A6aCB";
-export const GoerliExecutorAddress =
-  "0x3Dd35C630622dDb51c98c532F2f3e0fC68B20ad0";
-export const GoerliTradeExecutorAddress =
-  "0xBaEf66C5a73ea036ED135fcbFb59fcD00Fa50484";
+//Optimism Goerli
+export const BotAddress = "0xB0613B4355b06cd5594E58237FD9eF98dEc168C6";
+export const FinderAddress = "0x9654A29Cd0f9102f7d990D2597e5E530ff19A59e";
+export const ExecutorAddress = "0x4946B865f409201D7B5bC66e15c1C6a1ca88E22f";
+export const TradeExecutorAddress =
+  "0xdEb81833A456851629C6b1c0CEb6bee7fe71fd24";
 
-export const MainnetBotAddress = "0x12652102b8Ca0A0559dE58185E8E1c4BEA25EA58";
-export const MainnetFinderAddress =
-  "0x14ac66b2ed679dA7b1b7b7Bf3cbd1Fb537F84037";
-export const MainnetExecutorAddress =
-  "0x6538c5EFa8Ef8D0E087E890b9b9f74CeB53FF72F";
-export const MainnetTradeExecutorAddress =
-  "0x889362Cb60eCCa8549034729666e905F411360C2";
+//Optimism Mainnet
+// export const BotAddress = "0xcc9ca2cA211Eb7242e357Ac81bA1606de399B84A";
+// export const FinderAddress =
+//   "0x85f1B2A4525cAB0B25A265c0304FD7DE497Ad6f5";
+// export const ExecutorAddress =
+//   "0x673fcc5D78a3EbB1cbA1A096B005a1e1d80cac14";
+// export const TradeExecutorAddress =
+//   "0x93fA5385Fd7c01EB313998a45BCFD710ce4f5bA5";

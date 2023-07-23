@@ -9,6 +9,9 @@ export const styles = StyleSheet.create({
   text: {
     color: CombinedDarkTheme.colors.notification,
   },
+  errText: {
+    color: CombinedDarkTheme.colors.error,
+  },
   button: {
     backgroundColor: CombinedDarkTheme.colors.background,
     bottom: -340,

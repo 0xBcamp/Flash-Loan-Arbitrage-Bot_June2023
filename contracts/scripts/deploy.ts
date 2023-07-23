@@ -42,7 +42,7 @@ async function main() {
      with owner set to: '${signer.address}', balance: '${signerBalance}'`
   );
 
-  deployContracts();
+  await deployContracts();
 }
 
 export async function deployContracts(): Promise<Contracts> {
